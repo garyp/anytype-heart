@@ -1,0 +1,70 @@
+diff --git a/ccgo_linux_amd64.go b/ccgo_linux_amd64.go
+index a93029e..34f7dc0 100644
+--- a/ccgo_linux_amd64.go
++++ b/ccgo_linux_amd64.go
+@@ -135241,7 +135241,7 @@ func _fstatat_kstat(tls *TLS, fd int32, path uintptr, st uintptr, flag int32) (r
+ 		}
+ 	} else {
+ 		if (fd == -int32(100) || int32(*(*int8)(unsafe.Pointer(path))) == int32('/')) && flag == int32(AT_SYMLINK_NOFOLLOW) {
+-			ret = int32(X__syscall2(tls, int64(SYS_lstat), int64(path), int64(bp)))
++			ret = int32(X__syscall4(tls, int64(SYS_newfstatat), int64(fd), int64(path), int64(bp), int64(flag))) // was SYS_lstat: blocked by Android x86_64 app seccomp
+ 		} else {
+ 			if (fd == -int32(100) || int32(*(*int8)(unsafe.Pointer(path))) == int32('/')) && !(flag != 0) {
+ 				ret = int32(X__syscall2(tls, int64(SYS_stat), int64(path), int64(bp)))
+@@ -135378,7 +135378,7 @@ func Xmkdir(tls *TLS, path uintptr, mode Tmode_t) (r int32) {
+ 		trc("tls=%v path=%v mode=%v, (%v:)", tls, path, mode, origin(2))
+ 		defer func() { trc("-> %v", r) }()
+ 	}
+-	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall2(tls, int64(SYS_mkdir), int64(path), Int64FromUint32(mode)))))
++	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall3(tls, int64(SYS_mkdirat), int64(-Int32FromInt32(100)), int64(path), Int64FromUint32(mode)))))
+ }
+ 
+ func Xmkdirat(tls *TLS, fd int32, path uintptr, mode Tmode_t) (r int32) {
+@@ -139256,9 +139256,9 @@ func Xremove(tls *TLS, path uintptr) (r1 int32) {
+ 	}
+ 	var r int32
+ 	_ = r
+-	r = int32(X__syscall1(tls, int64(SYS_unlink), int64(path)))
++	r = int32(X__syscall3(tls, int64(SYS_unlinkat), int64(-Int32FromInt32(100)), int64(path), int64(0)))
+ 	if r == -int32(EISDIR) {
+-		r = int32(X__syscall1(tls, int64(SYS_rmdir), int64(path)))
++		r = int32(X__syscall3(tls, int64(SYS_unlinkat), int64(-Int32FromInt32(100)), int64(path), int64(AT_REMOVEDIR)))
+ 	}
+ 	return int32(X__syscall_ret(tls, Uint64FromInt32(r)))
+ }
+@@ -139268,7 +139268,7 @@ func Xrename(tls *TLS, old uintptr, new1 uintptr) (r int32) {
+ 		trc("tls=%v old=%v new1=%v, (%v:)", tls, old, new1, origin(2))
+ 		defer func() { trc("-> %v", r) }()
+ 	}
+-	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall2(tls, int64(SYS_rename), int64(old), int64(new1)))))
++	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall4(tls, int64(SYS_renameat), int64(-Int32FromInt32(100)), int64(old), int64(-Int32FromInt32(100)), int64(new1)))))
+ }
+ 
+ func Xrewind(tls *TLS, f uintptr) {
+@@ -150593,7 +150593,7 @@ func Xaccess(tls *TLS, filename uintptr, amode int32) (r int32) {
+ 		trc("tls=%v filename=%v amode=%v, (%v:)", tls, filename, amode, origin(2))
+ 		defer func() { trc("-> %v", r) }()
+ 	}
+-	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall2(tls, int64(SYS_access), int64(filename), int64(amode)))))
++	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall3(tls, int64(SYS_faccessat), int64(-Int32FromInt32(100)), int64(filename), int64(amode)))))
+ }
+ 
+ func Xacct(tls *TLS, filename uintptr) (r int32) {
+@@ -151289,7 +151289,7 @@ func Xrmdir(tls *TLS, path uintptr) (r int32) {
+ 		trc("tls=%v path=%v, (%v:)", tls, path, origin(2))
+ 		defer func() { trc("-> %v", r) }()
+ 	}
+-	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall1(tls, int64(SYS_rmdir), int64(path)))))
++	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall3(tls, int64(SYS_unlinkat), int64(-Int32FromInt32(100)), int64(path), int64(AT_REMOVEDIR)))))
+ }
+ 
+ func Xsetgid(tls *TLS, gid Tgid_t) (r int32) {
+@@ -151549,7 +151549,7 @@ func Xunlink(tls *TLS, path uintptr) (r int32) {
+ 		trc("tls=%v path=%v, (%v:)", tls, path, origin(2))
+ 		defer func() { trc("-> %v", r) }()
+ 	}
+-	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall1(tls, int64(SYS_unlink), int64(path)))))
++	return int32(X__syscall_ret(tls, Uint64FromInt64(X__syscall3(tls, int64(SYS_unlinkat), int64(-Int32FromInt32(100)), int64(path), int64(0)))))
+ }
+ 
+ func Xunlinkat(tls *TLS, fd int32, path uintptr, flag int32) (r int32) {

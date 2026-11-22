@@ -166,6 +166,10 @@ jobs:
           mkdir -p .release
           make ci-java-protos
 
+      - name: Patch modernc libc for Android x86_64
+        if: env.PLATFORM == 'all' || env.PLATFORM == 'android'
+        run: scripts/android-libc/apply.sh
+
       - name: Compile android lib
         if: env.PLATFORM == 'all' || env.PLATFORM == 'android'
         run: make compile-android-lib
