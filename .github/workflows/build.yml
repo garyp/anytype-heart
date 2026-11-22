@@ -83,7 +83,9 @@ jobs:
           echo ANDROID_NDK_ROOT=$NDK28 >> $GITHUB_ENV
           echo $(pwd)/deps >> $GITHUB_PATH
           echo "${GOBIN}" >> $GITHUB_PATH
-          git config --global url."https://${{ secrets.ANYTYPE_PAT }}@github.com/".insteadOf "https://github.com/"
+          if [ -n "${{ secrets.ANYTYPE_PAT }}" ]; then
+            git config --global url."https://${{ secrets.ANYTYPE_PAT }}@github.com/".insteadOf "https://github.com/"
+          fi
 
       - name: Go mod download
         run: go mod download
@@ -175,7 +177,7 @@ jobs:
           files: '.release/*'
 
       - name: Trigger integration tests in anytype-suite
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.repository_owner == 'anyproto'
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.ANYTYPE_SUITE_TRIGGER_TOKEN }}" \
@@ -184,7 +186,7 @@ jobs:
             -d "{\"event_type\": \"test-release\", \"client_payload\": {\"version\": \"${{ env.VERSION }}\"}}"
 
       - name: Trigger release in anytype-cli
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.repository_owner == 'anyproto'
         run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.ANYTYPE_CLI_TRIGGER_TOKEN }}" \
