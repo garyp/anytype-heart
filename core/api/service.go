@@ -367,3 +367,10 @@ func (s *apiService) RevokeToken(token string) {
 func SetMiddlewareParams(mw apicore.ClientCommands) {
 	mwSrv = mw
 }
+
+// MiddlewareParamsSet reports whether SetMiddlewareParams has been called.
+// Embedders (the mobile library, cmd/grpcserver) must call it: without it,
+// every authenticated JSON API request dereferences a nil middleware.
+func MiddlewareParamsSet() bool {
+	return mwSrv != nil
+}
