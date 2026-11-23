@@ -12,6 +12,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 
 	"github.com/anyproto/anytype-heart/core"
+	"github.com/anyproto/anytype-heart/core/api"
 	"github.com/anyproto/anytype-heart/core/event"
 	"github.com/anyproto/anytype-heart/metrics"
 	"github.com/anyproto/anytype-heart/pb"
@@ -44,6 +45,9 @@ func init() {
 				metrics.SharedLongMethodsInterceptor,
 			},
 		})
+	// cmd/grpcserver does this too: the JSON API needs the middleware to
+	// authenticate requests, and nil-derefs it otherwise.
+	api.SetMiddlewareParams(mw)
 	if addr, ok := os.LookupEnv("ANYPROF"); ok && addr != "" {
 		RunDebugServer(addr)
 	}
